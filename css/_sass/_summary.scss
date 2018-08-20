@@ -1,0 +1,61 @@
+div .summary {
+    text-align: center;
+    width: 100%;
+}
+
+div .summary .title {
+    color: $primary;
+    font-size: 40px;
+    font-style: italic;
+    font-weight: normal;
+    text-align: center;
+    vertical-align: middle;
+}
+
+thead .title {
+    padding: 10px;
+}
+
+div .summary .title .symbol {
+    font-style: normal;
+    font-weight: bold;
+    padding: 0px 5px;
+}
+
+div .summary img {
+    height: 40px;
+    width: 40px;
+    vertical-align: middle;
+}
+
+div .summary tbody th {
+    vertical-align: bottom;
+    width: 100px;
+}
+
+div .summary tbody .stat td {
+    vertical-align: bottom;
+    padding: 0px 1.25em 4px 1.25em;
+}
+
+div .summary tbody .graphs td {
+    font-size: 11pt;
+}
+
+div .summary tbody td .suffix {
+    color: $muted;
+    font-size: 9pt;
+}
+
+.vertmore {
+    text-align: center;
+}
+
+.vertmore input {
+    height: 30px;
+    font-family: $font-sans;
+    font-weight: bold;
+    font-size: 11pt;
+    background-color: $text;
+    border-radius: 0.5em;
+}

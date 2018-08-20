@@ -1,0 +1,64 @@
+#banner {
+    margin: 0 auto;
+    padding: 0em 0 1em;
+    text-align: center;
+    width: -moz-fit-content;
+    width: fit-content;
+}
+
+#banner h1 {
+    color: $primary;
+    font-family: $font-serif;
+    font-style: italic;
+    font-size: 36px;
+    font-weight: normal;
+    margin: 0;
+    text-shadow: -4px -3px hsl(5, 50%, 15%);
+}
+
+#banner h1 .service {
+    color: $accent;
+    font-size: 60px;
+}
+
+#banner h2 {
+    background: #ffa71a;
+    color: #363430;
+    font-family: $font-mono;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 0.2em;
+    margin: 0 auto;
+    max-width: 600px; // Fall back for when fit-content isn't supported.
+    padding: 2px;
+    text-transform: uppercase;
+}
+
+#banner div {
+    display: block;
+    margin: 0.5em 0 0;
+    padding: 0px;
+    font-size: 1.2em;
+    font-style: italic;
+    font-weight: bold;
+    letter-spacing: 0.3px;
+}
+
+#search {
+    color: $primary;
+    vertical-align: center;
+}
+
+#searchbar {
+    margin-top: 4px;
+    margin-left: 6px;
+    height: 14px;
+    width: 500px;
+    background-color: $background-accent;
+    color: $white;
+    font-family: $font-mono;
+    font-size: 12pt;
+    padding: 8px;
+    border: 2px solid $muted;
+    border-radius: 0.5em;
+}

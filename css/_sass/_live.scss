@@ -1,0 +1,132 @@
+$thinborder: 1px solid $border-noalpha;
+$thickborder: 4px solid $border-noalpha;
+
+$transactionstablepadding: 2px 20px;
+
+.live p {
+    text-align: center;
+}
+
+.live .headercontext {
+    margin-top: -20px;
+}
+
+.block {
+    margin-bottom: 0px;
+    width: 90%;
+}
+
+.block thead {
+    background-color: $background-accent;
+}
+
+.block .title {
+    color: $primary;
+    font-size: 18px;
+    font-weight: normal;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.block td {
+    font-size: 10.5pt;
+}
+
+.block td .transactions td {
+    font-size: 12pt;
+}
+
+.blockhash {
+    font-size: 14px;
+}
+
+.block thead,
+.block tbody {
+    border: $thickborder;
+}
+
+.block tbody th,
+.block tbody td {
+    border: $thinborder;
+    padding: 4px 12px;
+}
+
+.block tbody tr td:last-child {
+    border-right: $thickborder;
+}
+
+.block tbody .blocktransactions td {
+    border-top: $thickborder;
+    padding: 0px;
+}
+
+.block tbody .blocktransactions td .transactions td {
+    padding: 0px;
+}
+
+table .transactions {
+    border-collapse: collapse;
+    border: 0;
+}
+
+.blocktransactions td table {
+    width: 100%;
+    margin: 0px;
+}
+
+.transactions thead,
+.transactions tbody {
+    border: 0;
+}
+
+.transactions thead th,
+.transactions thead td,
+.transactions tbody th,
+.transactions tbody td {
+    border: {
+        color: $border-light;
+        style: solid;
+        width: 1px 0;
+    }
+    padding: $transactionstablepadding;
+}
+
+.transactions thead th {
+    color: $primary;
+    text-align: left;
+}
+
+.transactions thead th {
+    border-bottom: $thickborder;
+    border-top-width: 0;
+    font-weight: normal;
+}
+
+.transactions tbody td,
+.transactions tbody tr td:last-child {
+    border-left: 0;
+    border-right: 0;
+    padding: $transactionstablepadding;
+}
+
+.block tbody .blocktransactions .transactions tbody td {
+    border-top: 0;
+    padding: $transactionstablepadding;
+}
+
+.zeroes {
+    color: $muted;
+}
+
+.block tbody td .suffix,
+.transactions tbody td .suffix{
+    color: $muted;
+    font-size: 9pt;
+}
+
+.live .blockconnector {
+    border-left: $thickborder;
+    height: 35px;
+    width: 0%;
+    margin: 0px auto;
+}

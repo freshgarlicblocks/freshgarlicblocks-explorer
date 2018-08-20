@@ -1,0 +1,10 @@
+{
+    "private": true,
+    "scripts": {
+        "sass": "node-sass css/_sass -o css",
+        "sass-live": "node-sass -w css/_sass -o css"
+    },
+    "devDependencies": {
+        "node-sass": "^4.9.3"
+    }
+}
