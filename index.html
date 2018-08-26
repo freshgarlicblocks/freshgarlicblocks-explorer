@@ -7,9 +7,19 @@
         <link rel="stylesheet" href="css/styles.css" />
         <link rel="shortcut icon" type="image/png" href="favicon.png" />
 
+        <script language="javascript" src="js/3rd-party/jquery.min.js"></script>
+        <script language="javascript" src="js/3rd-party/angular.min.js"></script>
+
+        <script language="javascript" src="js/main.js" /></script>
+
+        <script language="javascript" src="js/coins.js" /></script>
+        <script language="javascript" src="js/price.js" /></script>
+        <script language="javascript" src="js/preprocessor.js" /></script>
+        <script language="javascript" src="js/stream.js" /></script>
+
         <title>FreshGRLC.NET Allium Blockchain Indexing Services</title>
     </head>
-    <body>
+    <body ngCloak onLoad="explorer.init();">
         <div id="banner">
             <h1><span class="service">Explorer</span>.FreshGRLC.NET</h1>
             <h2>Allium Blockchain Indexing Services</h2>
@@ -19,13 +29,13 @@
         </div>
 
         <div id="layout">
-            <div class="coinsummary grlc">
-                <div class="summary">
+            <div class="coinsummary grlc" ng-app="coin-grlc">
+                <div class="summary" ng-controller="summary" ng-init="showMoreDetails = false">
                     <table>
                         <thead>
                             <tr>
                                 <th colspan="3" class="title">
-                                    <img src="https://garlicoin.io/static/logo.040b5384.png" /> <span class="symbol">GRLC</span> - Garlicoin
+                                    <img ng-src="{{coin.logo}}" /> <span class="symbol">{{coin.ticker}}</span> - {{coin.name}}
                                 </th>
                             </tr>
                         </thead>
@@ -34,91 +44,142 @@
                                 <th>Latest block</th>
                                 <td>
                                     <div class="celltitle">Height</div>
-                                    445361
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="chain.lastblock.height != null" />
+                                    <span ng-hide="chain.lastblock.height == null">
+                                    {{chain.lastblock.height}}
+                                    </span>
                                 </td>
                                 <td>
                                     <div class="celltitle">Received at</div>
-                                    2018-08-19 19:00
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="chain.lastblock.firstseen != null" />
+                                    <span ng-hide="chain.lastblock.firstseen == null">
+                                    {{chain.lastblock.firstseen}}
+                                    </span>
                                 </td>
                             </tr>
                             <tr class="stat">
                                 <th>Difficulty</th>
                                 <td>
-                                    <div class="celltitle">Actual</div>
-                                    52.12
+                                    <div class="celltitle">Network</div>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="chain.lastblock.difficulty != null" />
+                                    <span ng-hide="chain.lastblock.difficulty == null">
+                                    {{chain.lastblock.difficulty}}
+                                    </span>
                                 </td>
                                 <td>
                                     <div class="celltitle">Adjusted (50 coins/min)</div>
-                                    34.75
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="chain.lastblock.adjustedDifficulty != null" />
+                                    <span ng-hide="chain.lastblock.adjustedDifficulty == null">
+                                    {{chain.lastblock.adjustedDifficulty}}
+                                    </span>
                                 </td>
                             </tr>
-                            <tr class="stat">
+                            <tr ng-hide="showMoreDetails">
+                                <td colspan="3" class="vertmore"><input type="button" value="&darr; More statistics &darr;" ng-click="moreDetails()"/></td>
+                            </tr>
+                            <tr class="stat" ng-hide="!showMoreDetails">
                                 <th>24 hour activity</th>
                                 <td>
                                     <div class="celltitle">Transactions</div>
-                                    3207 <span class="suffix">transactions</span>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="stats.daily.transactions.amount != null" />
+                                    <span ng-hide="stats.daily.transactions.amount == null">
+                                    {{stats.daily.transactions.amount}} <span class="suffix">transactions</span>
+                                    </span>
                                 </td>
                                 <td>
                                     <div class="celltitle">Total value</div>
-                                    650710 <span class="suffix">GRLC</span>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="stats.daily.transactions.totalvalue != null" />
+                                    <span ng-hide="stats.daily.transactions.totalvalue == null">
+                                    {{stats.daily.transactions.totalvalue}} <span class="suffix">{{coin.ticker}}</span>
+                                    </span>
                                 </td>
                             </tr>
-                            <tr class="stat">
+                            <tr class="stat" ng-hide="!showMoreDetails">
                                 <th>24 hours mining stats</th>
                                 <td>
                                     <div class="celltitle">Blocks mined</div>
-                                    2062 <span class="suffix">blocks</span>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="stats.daily.blocks.amount != null" />
+                                    <span ng-hide="stats.daily.blocks.amount == null">
+                                    {{stats.daily.blocks.amount}} <span class="suffix">blocks</span>
+                                    </span>
                                 </td>
                                 <td>
                                     <div class="celltitle">Generated wealth</div>
-                                    <span class="suffix">$</span> 711.39
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="stats.daily.miningreward.usd != null" />
+                                    <span ng-hide="stats.daily.miningreward.usd == null">
+                                    <span class="suffix">$</span> {{stats.daily.miningreward.usd}}
+                                    </span>
                                 </td>
                             </tr>
-                            <tr class="stat">
+                            <tr class="stat" ng-hide="!showMoreDetails">
                                 <th>Decentralization</th>
                                 <td>
                                     <div class="celltitle">Controlling 50%</div>
-                                    3 <span class="suffix">pools</span>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="pools.hashratecontrol.numberrequiredfor50percent != null" />
+                                    <span ng-hide="pools.hashratecontrol.numberrequiredfor50percent == null">
+                                    {{pools.hashratecontrol.numberrequiredfor50percent}} <span class="suffix">pools</span>
+                                    </span>
                                 </td>
                                 <td>
                                     <div class="celltitle">Controlling 90%</div>
-                                    8 <span class="suffix">pools</span>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="pools.hashratecontrol.numberrequiredfor90percent != null" />
+                                    <span ng-hide="pools.hashratecontrol.numberrequiredfor90percent == null">
+                                    {{pools.hashratecontrol.numberrequiredfor90percent}} <span class="suffix">pools</span>
+                                    </span>
                                 </td>
                             </tr>
-                            <tr class="stat">
+                            <tr class="stat" ng-hide="!showMoreDetails">
                                 <th>Average blocktime</th>
                                 <td>
                                     <div class="celltitle">Last 5000 blocks</div>
-                                    41.11 <span class="suffix">seconds</span>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="stats.blocktime.last5000blocks != null" />
+                                    <span ng-hide="stats.blocktime.last5000blocks == null">
+                                    {{stats.blocktime.last5000blocks}} <span class="suffix">seconds</span>
+                                    </span>
                                 </td>
                                 <td>
                                     <div class="celltitle">Last 50000 blocks</div>
-                                    41.12 <span class="suffix">seconds</span>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="stats.blocktime.last50000blocks != null" />
+                                    <span ng-hide="stats.blocktime.last50000blocks == null">
+                                    {{stats.blocktime.last50000blocks}} <span class="suffix">seconds</span>
+                                    </span>
                                 </td>
                             </tr>
-                            <tr class="stat">
+                            <tr class="stat" ng-hide="!showMoreDetails">
                                 <th>Coin value</th>
                                 <td>
                                     <div class="celltitle">In crypto</div>
-                                    100 <span class="suffix">Satoshis</span>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="price.sats != null" />
+                                    <span ng-hide="price.sats == null">
+                                    {{price.sats}} <span class="suffix">Satoshis</span>
+                                    </span>
                                 </td>
                                 <td>
                                     <div class="celltitle">In fiat</div>
-                                    0.69 <span class="suffix">USD &cent;</span>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="price.usd_cents != null" />
+                                    <span ng-hide="price.usd_cents == null">
+                                    {{price.usd_cents}} <span class="suffix">USD &cent;</span>
+                                    </span>
                                 </td>
                             </tr>
-                            <tr class="stat">
+                            <tr class="stat" ng-hide="!showMoreDetails">
                                 <th>Network totals</th>
                                 <td>
                                     <div class="celltitle">All-time transactions</div>
-                                    1186569 <span class="suffix">transactions</span>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="stats.all.transactions.amount != null" />
+                                    <span ng-hide="stats.all.transactions.amount == null">
+                                    {{stats.all.transactions.amount}} <span class="suffix">transactions</span>
+                                    </span>
                                 </td>
                                 <td>
                                     <div class="celltitle">Coins released (est.)</div>
-                                    22289450 <span class="suffix">GRLC</span>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="stats.all.blocks.amount != null && coin.blockReward != null" />
+                                    <span ng-hide="stats.all.blocks.amount == null || coin.blockReward == null">
+                                    {{stats.all.blocks.amount * coin.blockReward}} <span class="suffix">{{coin.ticker}}</span>
+                                    </span>
                                 </td>
                             </tr>
-                            <tr class="graphs">
+                            <tr class="graphs" ng-hide="!showMoreDetails">
                                 <th>Graphs</th>
                                 <td>
                                     <a href="#" target="_blank">Block distribution</a>
@@ -133,7 +194,7 @@
 
                 <div class="live">
                     <h3>Unconfirmed transactions</h3>
-                    <table class="transactions">
+                    <table class="transactions" ng-controller="mempool">
                         <thead>
                             <tr>
                                 <th>Transaction ID</th>
@@ -143,374 +204,117 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td><a href="#">aed73191...5f079fab</a></td>
-                                <td>2018-08-19 22:27:00</td>
-                                <td>208</td>
-                                <td>4.32<span class="suffix">000000 GRLC</span></td>
+                            <tr ng-repeat="tx in transactions">
+                                <td><a href="#">{{tx.shortenedtxid}}</a></td>
+                                <td>{{tx.firstseen}}</td>
+                                <td>{{tx.size.raw}}</td>
+                                <td>{{tx.totalvalue.major}}.<span class="suffix">{{tx.totalvalue.minor}} {{coin.ticker}}</span></td>
                             </tr>
-                            <tr>
-                                <td><a href="#">aed73191...5f079fab</a></td>
-                                <td>2018-08-19 22:27:00</td>
-                                <td>208</td>
-                                <td>4.32<span class="suffix">000000 GRLC</span></td>
+                            <tr class="noentries" ng-hide="transactions.length > 0">
+                                <td colspan="4">All transactions are confirmed.</td>
                             </tr>
-                            <tr>
-                                <td><a href="#">aed73191...5f079fab</a></td>
-                                <td>2018-08-19 22:27:00</td>
-                                <td>208</td>
-                                <td>4.32<span class="suffix">000000 GRLC</span></td>
-                            </tr>
-                            <tr>
-                                <td><a href="#">aed73191...5f079fab</a></td>
-                                <td>2018-08-19 22:27:00</td>
-                                <td>208</td>
-                                <td>4.32<span class="suffix">000000 GRLC</span></td>
-                            </tr>
-                        </thead>
+                        </tbody>
                     </table>
 
-                    <h3>Recent blocks</h3>
-                    <p class="headercontext">
-                        <a href="#">Browse all blocks</a>
-                    </p>
+                    <div ng-controller="blocks">
+                        <h3>Recent blocks</h3>
+                        <p class="headercontext">
+                            <a href="#">Browse all blocks</a>
+                        </p>
 
-                    <table class="block">
-                        <thead>
-                            <tr>
-                                <th colspan="5" class="title">Block <a href="#" class="blockhash">1da69d8bd4f5ba205b31befdee2f7001babd62616303092f5835dc9790555b51</a></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="stat">
-                                <td>
-                                    <div class="celltitle">Height</div>
-                                    445361
-                                </td>
-                                <td>
-                                    <div class="celltitle">Transactions</div>
-                                    4
-                                </td>
-                                <td>
-                                    <div class="celltitle">Total value</div>
-                                    134.<span class="suffix">75497378 GRLC</span>
-                                </td>
-                                <td>
-                                    <div class="celltitle">Mined by</div>
-                                    Idcray's Garlicoin Pool
-                                </td>
-                                <td>
-                                    <div class="celltitle">Timestamp</div>
-                                    2018-08-19 19:00
-                                </td>
-                            </tr>
-                            <tr class="stat">
-                                <td>
-                                    <div class="celltitle">Size</div>
-                                    334 kB
-                                </td>
-                                <td>
-                                    <div class="celltitle">Difficulty</div>
-                                    56.12
-                                </td>
-                                <td>
-                                    <div class="celltitle">Miner fee</div>
-                                    <span class="zeroes">0.00</span>498899 <span class="suffix">GRLC</span>
-                                </td>
-                                <td>
-                                    <div class="celltitle">Relayed by</div>
-                                    2a01:4f8:1c0c:48f9::1
-                                </td>
-                                <td>
-                                    <div class="celltitle">Relayed at</div>
-                                    2018-08-19 19:00
-                                </td>
-                            </tr>
-                            <tr class="blocktransactions">
-                                <td colspan="5">
-                                    <table class="transactions">
-                                        <thead>
-                                            <tr>
-                                                <th>Transaction ID</th>
-                                                <th>Confirmed after</th>
-                                                <th>Size</th>
-                                                <th>Value</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><a href="#">aed73191...5f079fab</a></td>
-                                                <td><i>Coinbase</i></td>
-                                                <td>2419</td>
-                                                <td>50.<span class="suffix">00000000 GRLC</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td><a href="#">aed73191...5f079fab</a></td>
-                                                <td>1 minute</td>
-                                                <td>208</td>
-                                                <td>4.32<span class="suffix">000000 GRLC</span></td>
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="blockconnector"></div>
-                    <table class="block">
-                        <thead>
-                            <tr>
-                                <th colspan="5" class="title">Block <a href="#" class="blockhash">1da69d8bd4f5ba205b31befdee2f7001babd62616303092f5835dc9790555b51</a></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="stat">
-                                <td>
-                                    <div class="celltitle">Height</div>
-                                    445361
-                                </td>
-                                <td>
-                                    <div class="celltitle">Transactions</div>
-                                    4
-                                </td>
-                                <td>
-                                    <div class="celltitle">Total value</div>
-                                    134.<span class="suffix">75497378 GRLC</span>
-                                </td>
-                                <td>
-                                    <div class="celltitle">Mined by</div>
-                                    FreshGRLC.net
-                                </td>
-                                <td>
-                                    <div class="celltitle">Timestamp</div>
-                                    2018-08-19 19:00
-                                </td>
-                            </tr>
-                            <tr class="stat">
-                                <td>
-                                    <div class="celltitle">Size</div>
-                                    334 kB
-                                </td>
-                                <td>
-                                    <div class="celltitle">Difficulty</div>
-                                    56.12
-                                </td>
-                                <td>
-                                    <div class="celltitle">Miner fee</div>
-                                    <span class="zeroes">0.00</span>498899 <span class="suffix">GRLC</span>
-                                </td>
-                                <td>
-                                    <div class="celltitle">Relayed by</div>
-                                    224.34.143.54
-                                </td>
-                                <td>
-                                    <div class="celltitle">Relayed at</div>
-                                    2018-08-19 19:00
-                                </td>
-                            </tr>
-                            <tr class="blocktransactions">
-                                <td colspan="5">
-                                    <table class="transactions">
-                                        <thead>
-                                            <tr>
-                                                <th>Transaction ID</th>
-                                                <th>Confirmed after</th>
-                                                <th>Size</th>
-                                                <th>Value</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><a href="#">aed73191...5f079fab</a></td>
-                                                <td><i>Coinbase</i></td>
-                                                <td>2419</td>
-                                                <td>50.<span class="suffix">00000000 GRLC</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td><a href="#">aed73191...5f079fab</a></td>
-                                                <td>1 minute</td>
-                                                <td>208</td>
-                                                <td>4.32<span class="suffix">000000 GRLC</span></td>
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="blockconnector"></div>
-                    <table class="block">
-                        <thead>
-                            <tr>
-                                <th colspan="5" class="title">Block <a href="#" class="blockhash">1da69d8bd4f5ba205b31befdee2f7001babd62616303092f5835dc9790555b51</a></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="stat">
-                                <td>
-                                    <div class="celltitle">Height</div>
-                                    445361
-                                </td>
-                                <td>
-                                    <div class="celltitle">Transactions</div>
-                                    4
-                                </td>
-                                <td>
-                                    <div class="celltitle">Total value</div>
-                                    134.<span class="suffix">75497378 GRLC</span>
-                                </td>
-                                <td>
-                                    <div class="celltitle">Mined by</div>
-                                    FreshGRLC.net
-                                </td>
-                                <td>
-                                    <div class="celltitle">Timestamp</div>
-                                    2018-08-19 19:00
-                                </td>
-                            </tr>
-                            <tr class="stat">
-                                <td>
-                                    <div class="celltitle">Size</div>
-                                    334 kB
-                                </td>
-                                <td>
-                                    <div class="celltitle">Difficulty</div>
-                                    56.12
-                                </td>
-                                <td>
-                                    <div class="celltitle">Miner fee</div>
-                                    <span class="zeroes">0.00</span>498899 <span class="suffix">GRLC</span>
-                                </td>
-                                <td>
-                                    <div class="celltitle">Relayed by</div>
-                                    224.34.143.54
-                                </td>
-                                <td>
-                                    <div class="celltitle">Relayed at</div>
-                                    2018-08-19 19:00
-                                </td>
-                            </tr>
-                            <tr class="blocktransactions">
-                                <td colspan="5">
-                                    <table class="transactions">
-                                        <thead>
-                                            <tr>
-                                                <th>Transaction ID</th>
-                                                <th>Confirmed after</th>
-                                                <th>Size</th>
-                                                <th>Value</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><a href="#">aed73191...5f079fab</a></td>
-                                                <td><i>Coinbase</i></td>
-                                                <td>2419</td>
-                                                <td>50.<span class="suffix">00000000 GRLC</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td><a href="#">aed73191...5f079fab</a></td>
-                                                <td>1 minute</td>
-                                                <td>208</td>
-                                                <td>4.32<span class="suffix">000000 GRLC</span></td>
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="blockconnector"></div>
-                    <table class="block">
-                        <thead>
-                            <tr>
-                                <th colspan="5" class="title">Block <a href="#" class="blockhash">1da69d8bd4f5ba205b31befdee2f7001babd62616303092f5835dc9790555b51</a></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="stat">
-                                <td>
-                                    <div class="celltitle">Height</div>
-                                    445361
-                                </td>
-                                <td>
-                                    <div class="celltitle">Transactions</div>
-                                    4
-                                </td>
-                                <td>
-                                    <div class="celltitle">Total value</div>
-                                    134.<span class="suffix">75497378 GRLC</span>
-                                </td>
-                                <td>
-                                    <div class="celltitle">Mined by</div>
-                                    FreshGRLC.net
-                                </td>
-                                <td>
-                                    <div class="celltitle">Timestamp</div>
-                                    2018-08-19 19:00
-                                </td>
-                            </tr>
-                            <tr class="stat">
-                                <td>
-                                    <div class="celltitle">Size</div>
-                                    334 kB
-                                </td>
-                                <td>
-                                    <div class="celltitle">Difficulty</div>
-                                    56.12
-                                </td>
-                                <td>
-                                    <div class="celltitle">Miner fee</div>
-                                    <span class="zeroes">0.00</span>498899 <span class="suffix">GRLC</span>
-                                </td>
-                                <td>
-                                    <div class="celltitle">Relayed by</div>
-                                    224.34.143.54
-                                </td>
-                                <td>
-                                    <div class="celltitle">Relayed at</div>
-                                    2018-08-19 19:00
-                                </td>
-                            </tr>
-                            <tr class="blocktransactions">
-                                <td colspan="5">
-                                    <table class="transactions">
-                                        <thead>
-                                            <tr>
-                                                <th>Transaction ID</th>
-                                                <th>Confirmed after</th>
-                                                <th>Size</th>
-                                                <th>Value</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><a href="#">aed73191...5f079fab</a></td>
-                                                <td><i>Coinbase</i></td>
-                                                <td>2419</td>
-                                                <td>50.<span class="suffix">00000000 GRLC</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td><a href="#">aed73191...5f079fab</a></td>
-                                                <td>1 minute</td>
-                                                <td>208</td>
-                                                <td>4.32<span class="suffix">000000 GRLC</span></td>
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                        <div style="width: 100%; text-align: center; margin: 0px auto;" ng-hide="blocks != null">
+                            <img src="loading.gif" style="width: 20px; height: 20px;" />
+                        </div>
+                        <div class="blockcontainer" ng-repeat="block in blocks">
+                            <table class="block">
+                                <thead>
+                                    <tr>
+                                        <th colspan="5" class="title">Block <a href="#" class="blockhash">{{block.hash}}</a></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="stat">
+                                        <td style="width: 70px;">
+                                            <div class="celltitle">Height</div>
+                                            {{block.height}}
+                                        </td>
+                                        <td style="width: 100px;">
+                                            <div class="celltitle">Transactions</div>
+                                            {{block.transactions.length}}
+                                        </td>
+                                        <td style="width: 140px;">
+                                            <div class="celltitle">Total value</div>
+                                            {{block.totalvalue.major}}.<span class="suffix">{{block.totalvalue.minor}} {{coin.ticker}}</span>
+                                        </td>
+                                        <td style="width: 205px;">
+                                            <div class="celltitle">Mined by</div>
+                                            <span ng-hide="block.miner.website">{{block.miner.name}}</span>
+                                            <span ng-hide="!block.miner.website"><a href="{{block.miner.website}}" target="_blank">{{block.miner.name}}</a></span>
+                                        </td>
+                                        <td style="width: 140px;">
+                                            <div class="celltitle">Timestamp</div>
+                                            {{block.timestamp}}
+                                        </td>
+                                    </tr>
+                                    <tr class="stat">
+                                        <td>
+                                            <div class="celltitle">Size</div>
+                                            {{block.size.formatted}}
+                                        </td>
+                                        <td>
+                                            <div class="celltitle">Difficulty</div>
+                                            {{block.difficulty}}
+                                        </td>
+                                        <td>
+                                            <div class="celltitle">Miner fee</div>
+                                            {{block.totalfee.raw}} <span class="suffix">{{coin.ticker}}</span>
+                                        </td>
+                                        <td>
+                                            <div class="celltitle">Relayed by</div>
+                                            {{block.relayedby}}
+                                        </td>
+                                        <td>
+                                            <div class="celltitle">Relayed at</div>
+                                            {{block.firstseen}}
+                                        </td>
+                                    </tr>
+                                    <tr class="blocktransactions">
+                                        <td colspan="5">
+                                            <table class="transactions">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Transaction ID</th>
+                                                        <th>Confirmed after</th>
+                                                        <th>Size</th>
+                                                        <th>Value</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="tx in block.transactions">
+                                                        <td><a href="#">{{tx.shortenedtxid}}</a></td>
+                                                        <td ng-hide="tx.coinbase">{{tx.confirmationtime}}</td>
+                                                        <td ng-hide="!tx.coinbase"><i>(Coinbase)</i></td>
+                                                        <td>{{tx.size.raw}}</td>
+                                                        <td>{{tx.totalvalue.major}}.<span class="suffix">{{tx.totalvalue.minor}} {{coin.ticker}}</span></td>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="blockconnector"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="coinsummary tux">
-                <div class="summary">
+            <div class="coinsummary tux" ng-app="coin-tux">
+                <div class="summary" ng-controller="summary" ng-init="showMoreDetails = false">
                     <table>
                         <thead>
                             <tr>
                                 <th colspan="3" class="title">
-                                    <img src="https://tuxcoin.io/wp-content/uploads/2018/08/NEW-logo.png" /> <span class="title"><span class="symbol">TUX</span> - Tuxcoin</span>
+                                    <img ng-src="{{coin.logo}}" /> <span class="symbol">{{coin.ticker}}</span> - {{coin.name}}
                                 </th>
                             </tr>
                         </thead>
@@ -519,26 +323,149 @@
                                 <th>Latest block</th>
                                 <td>
                                     <div class="celltitle">Height</div>
-                                    445361
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="chain.lastblock.height != null" />
+                                    <span ng-hide="chain.lastblock.height == null">
+                                    {{chain.lastblock.height}}
+                                    </span>
                                 </td>
                                 <td>
                                     <div class="celltitle">Received at</div>
-                                    2018-08-19 19:00
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="chain.lastblock.firstseen != null" />
+                                    <span ng-hide="chain.lastblock.firstseen == null">
+                                    {{chain.lastblock.firstseen}}
+                                    </span>
                                 </td>
                             </tr>
                             <tr class="stat">
                                 <th>Difficulty</th>
                                 <td>
-                                    <div class="celltitle">Actual</div>
-                                    52.12
+                                    <div class="celltitle">Network</div>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="chain.lastblock.difficulty != null" />
+                                    <span ng-hide="chain.lastblock.difficulty == null">
+                                    {{chain.lastblock.difficulty}}
+                                    </span>
                                 </td>
                                 <td>
                                     <div class="celltitle">Adjusted (50 coins/min)</div>
-                                    34.75
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="chain.lastblock.adjustedDifficulty != null" />
+                                    <span ng-hide="chain.lastblock.adjustedDifficulty == null">
+                                    {{chain.lastblock.adjustedDifficulty}}
+                                    </span>
                                 </td>
                             </tr>
-                            <tr>
-                                <td colspan="3" class="vertmore"><input type="button" value="&darr; More statistics &darr;"/></td>
+                            <tr ng-hide="showMoreDetails">
+                                <td colspan="3" class="vertmore"><input type="button" value="&darr; More statistics &darr;" ng-click="moreDetails()"/></td>
+                            </tr>
+                            <tr class="stat" ng-hide="!showMoreDetails">
+                                <th>24 hour activity</th>
+                                <td>
+                                    <div class="celltitle">Transactions</div>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="stats.daily.transactions.amount != null" />
+                                    <span ng-hide="stats.daily.transactions.amount == null">
+                                    {{stats.daily.transactions.amount}} <span class="suffix">transactions</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="celltitle">Total value</div>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="stats.daily.transactions.totalvalue != null" />
+                                    <span ng-hide="stats.daily.transactions.totalvalue == null">
+                                    {{stats.daily.transactions.totalvalue}} <span class="suffix">{{coin.ticker}}</span>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr class="stat" ng-hide="!showMoreDetails">
+                                <th>24 hours mining stats</th>
+                                <td>
+                                    <div class="celltitle">Blocks mined</div>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="stats.daily.blocks.amount != null" />
+                                    <span ng-hide="stats.daily.blocks.amount == null">
+                                    {{stats.daily.blocks.amount}} <span class="suffix">blocks</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="celltitle">Generated wealth</div>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="stats.daily.miningreward.usd != null" />
+                                    <span ng-hide="stats.daily.miningreward.usd == null">
+                                    <span class="suffix">$</span> {{stats.daily.miningreward.usd}}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr class="stat" ng-hide="!showMoreDetails">
+                                <th>Decentralization</th>
+                                <td>
+                                    <div class="celltitle">Controlling 50%</div>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="pools.hashratecontrol.numberrequiredfor50percent != null" />
+                                    <span ng-hide="pools.hashratecontrol.numberrequiredfor50percent == null">
+                                    {{pools.hashratecontrol.numberrequiredfor50percent}} <span class="suffix">pools</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="celltitle">Controlling 90%</div>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="pools.hashratecontrol.numberrequiredfor90percent != null" />
+                                    <span ng-hide="pools.hashratecontrol.numberrequiredfor90percent == null">
+                                    {{pools.hashratecontrol.numberrequiredfor90percent}} <span class="suffix">pools</span>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr class="stat" ng-hide="!showMoreDetails">
+                                <th>Average blocktime</th>
+                                <td>
+                                    <div class="celltitle">Last 5000 blocks</div>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="stats.blocktime.last5000blocks != null" />
+                                    <span ng-hide="stats.blocktime.last5000blocks == null">
+                                    {{stats.blocktime.last5000blocks}} <span class="suffix">seconds</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="celltitle">Last 50000 blocks</div>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="stats.blocktime.last50000blocks != null" />
+                                    <span ng-hide="stats.blocktime.last50000blocks == null">
+                                    {{stats.blocktime.last50000blocks}} <span class="suffix">seconds</span>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr class="stat" ng-hide="!showMoreDetails">
+                                <th>Coin value</th>
+                                <td>
+                                    <div class="celltitle">In crypto</div>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="price.sats != null" />
+                                    <span ng-hide="price.sats == null">
+                                    {{price.sats}} <span class="suffix">Satoshis</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="celltitle">In fiat</div>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="price.usd_cents != null" />
+                                    <span ng-hide="price.usd_cents == null">
+                                    {{price.usd_cents}} <span class="suffix">USD &cent;</span>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr class="stat" ng-hide="!showMoreDetails">
+                                <th>Network totals</th>
+                                <td>
+                                    <div class="celltitle">All-time transactions</div>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="stats.all.transactions.amount != null" />
+                                    <span ng-hide="stats.all.transactions.amount == null">
+                                    {{stats.all.transactions.amount}} <span class="suffix">transactions</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="celltitle">Coins released (est.)</div>
+                                    <img src="loading.gif" style="width: 20px; height: 20px;" ng-hide="stats.all.blocks.amount != null && coin.blockReward != null" />
+                                    <span ng-hide="stats.all.blocks.amount == null || coin.blockReward == null">
+                                    {{stats.all.blocks.amount * coin.blockReward}} <span class="suffix">{{coin.ticker}}</span>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr class="graphs" ng-hide="!showMoreDetails">
+                                <th>Graphs</th>
+                                <td>
+                                    <a href="#" target="_blank">Block distribution</a>
+                                </td>
+                                <td>
+                                    <a href="#" target="_blank">Network activity</a>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -546,7 +473,7 @@
 
                 <div class="live">
                     <h3>Unconfirmed transactions</h3>
-                    <table class="transactions">
+                    <table class="transactions" ng-controller="mempool">
                         <thead>
                             <tr>
                                 <th>Transaction ID</th>
@@ -556,365 +483,108 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td><a href="#">aed73191...5f079fab</a></td>
-                                <td>2018-08-19 22:27:00</td>
-                                <td>208</td>
-                                <td>4.32<span class="suffix">000000 GRLC</span></td>
+                            <tr ng-repeat="tx in transactions">
+                                <td><a href="#">{{tx.shortenedtxid}}</a></td>
+                                <td>{{tx.firstseen}}</td>
+                                <td>{{tx.size.raw}}</td>
+                                <td>{{tx.totalvalue.major}}.<span class="suffix">{{tx.totalvalue.minor}} {{coin.ticker}}</span></td>
                             </tr>
-                            <tr>
-                                <td><a href="#">aed73191...5f079fab</a></td>
-                                <td>2018-08-19 22:27:00</td>
-                                <td>208</td>
-                                <td>4.32<span class="suffix">000000 GRLC</span></td>
+                            <tr class="noentries" ng-hide="transactions.length > 0">
+                                <td colspan="4">All transactions are confirmed.</td>
                             </tr>
-                            <tr>
-                                <td><a href="#">aed73191...5f079fab</a></td>
-                                <td>2018-08-19 22:27:00</td>
-                                <td>208</td>
-                                <td>4.32<span class="suffix">000000 GRLC</span></td>
-                            </tr>
-                            <tr>
-                                <td><a href="#">aed73191...5f079fab</a></td>
-                                <td>2018-08-19 22:27:00</td>
-                                <td>208</td>
-                                <td>4.32<span class="suffix">000000 GRLC</span></td>
-                            </tr>
-                        </thead>
+                        </tbody>
                     </table>
 
-                    <h3>Recent blocks</h3>
-                    <p class="headercontext">
-                        <a href="#">Browse all blocks</a>
-                    </p>
+                    <div ng-controller="blocks">
+                        <h3>Recent blocks</h3>
+                        <p class="headercontext">
+                            <a href="#">Browse all blocks</a>
+                        </p>
 
-                    <table class="block">
-                        <thead>
-                            <tr>
-                                <th colspan="5" class="title">Block <a href="#" class="blockhash">1da69d8bd4f5ba205b31befdee2f7001babd62616303092f5835dc9790555b51</a></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="stat">
-                                <td>
-                                    <div class="celltitle">Height</div>
-                                    445361
-                                </td>
-                                <td>
-                                    <div class="celltitle">Transactions</div>
-                                    4
-                                </td>
-                                <td>
-                                    <div class="celltitle">Total value</div>
-                                    134.<span class="suffix">75497378 GRLC</span>
-                                </td>
-                                <td>
-                                    <div class="celltitle">Mined by</div>
-                                    Idcray's Garlicoin Pool
-                                </td>
-                                <td>
-                                    <div class="celltitle">Timestamp</div>
-                                    2018-08-19 19:00
-                                </td>
-                            </tr>
-                            <tr class="stat">
-                                <td>
-                                    <div class="celltitle">Size</div>
-                                    334 kB
-                                </td>
-                                <td>
-                                    <div class="celltitle">Difficulty</div>
-                                    56.12
-                                </td>
-                                <td>
-                                    <div class="celltitle">Miner fee</div>
-                                    <span class="zeroes">0.00</span>498899 <span class="suffix">GRLC</span>
-                                </td>
-                                <td>
-                                    <div class="celltitle">Relayed by</div>
-                                    224.34.143.54
-                                </td>
-                                <td>
-                                    <div class="celltitle">Relayed at</div>
-                                    2018-08-19 19:00
-                                </td>
-                            </tr>
-                            <tr class="blocktransactions">
-                                <td colspan="5">
-                                    <table class="transactions">
-                                        <thead>
-                                            <tr>
-                                                <th>Transaction ID</th>
-                                                <th>Confirmed after</th>
-                                                <th>Size</th>
-                                                <th>Value</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><a href="#">aed73191...5f079fab</a></td>
-                                                <td><i>Coinbase</i></td>
-                                                <td>2419</td>
-                                                <td>50.<span class="suffix">00000000 GRLC</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td><a href="#">aed73191...5f079fab</a></td>
-                                                <td>1 minute</td>
-                                                <td>208</td>
-                                                <td>4.32<span class="suffix">000000 GRLC</span></td>
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="blockconnector"></div>
-                    <table class="block">
-                        <thead>
-                            <tr>
-                                <th colspan="5" class="title">Block <a href="#" class="blockhash">1da69d8bd4f5ba205b31befdee2f7001babd62616303092f5835dc9790555b51</a></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="stat">
-                                <td>
-                                    <div class="celltitle">Height</div>
-                                    445361
-                                </td>
-                                <td>
-                                    <div class="celltitle">Transactions</div>
-                                    4
-                                </td>
-                                <td>
-                                    <div class="celltitle">Total value</div>
-                                    134.<span class="suffix">75497378 GRLC</span>
-                                </td>
-                                <td>
-                                    <div class="celltitle">Mined by</div>
-                                    FreshGRLC.net
-                                </td>
-                                <td>
-                                    <div class="celltitle">Timestamp</div>
-                                    2018-08-19 19:00
-                                </td>
-                            </tr>
-                            <tr class="stat">
-                                <td>
-                                    <div class="celltitle">Size</div>
-                                    334 kB
-                                </td>
-                                <td>
-                                    <div class="celltitle">Difficulty</div>
-                                    56.12
-                                </td>
-                                <td>
-                                    <div class="celltitle">Miner fee</div>
-                                    <span class="zeroes">0.00</span>498899 <span class="suffix">GRLC</span>
-                                </td>
-                                <td>
-                                    <div class="celltitle">Relayed by</div>
-                                    224.34.143.54
-                                </td>
-                                <td>
-                                    <div class="celltitle">Relayed at</div>
-                                    2018-08-19 19:00
-                                </td>
-                            </tr>
-                            <tr class="blocktransactions">
-                                <td colspan="5">
-                                    <table class="transactions">
-                                        <thead>
-                                            <tr>
-                                                <th>Transaction ID</th>
-                                                <th>Confirmed after</th>
-                                                <th>Size</th>
-                                                <th>Value</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><a href="#">aed73191...5f079fab</a></td>
-                                                <td><i>Coinbase</i></td>
-                                                <td>2419</td>
-                                                <td>50.<span class="suffix">00000000 GRLC</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td><a href="#">aed73191...5f079fab</a></td>
-                                                <td>1 minute</td>
-                                                <td>208</td>
-                                                <td>4.32<span class="suffix">000000 GRLC</span></td>
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="blockconnector"></div>
-                    <table class="block">
-                        <thead>
-                            <tr>
-                                <th colspan="5" class="title">Block <a href="#" class="blockhash">1da69d8bd4f5ba205b31befdee2f7001babd62616303092f5835dc9790555b51</a></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="stat">
-                                <td>
-                                    <div class="celltitle">Height</div>
-                                    445361
-                                </td>
-                                <td>
-                                    <div class="celltitle">Transactions</div>
-                                    4
-                                </td>
-                                <td>
-                                    <div class="celltitle">Total value</div>
-                                    134.<span class="suffix">75497378 GRLC</span>
-                                </td>
-                                <td>
-                                    <div class="celltitle">Mined by</div>
-                                    FreshGRLC.net
-                                </td>
-                                <td>
-                                    <div class="celltitle">Timestamp</div>
-                                    2018-08-19 19:00
-                                </td>
-                            </tr>
-                            <tr class="stat">
-                                <td>
-                                    <div class="celltitle">Size</div>
-                                    334 kB
-                                </td>
-                                <td>
-                                    <div class="celltitle">Difficulty</div>
-                                    56.12
-                                </td>
-                                <td>
-                                    <div class="celltitle">Miner fee</div>
-                                    <span class="zeroes">0.00</span>498899 <span class="suffix">GRLC</span>
-                                </td>
-                                <td>
-                                    <div class="celltitle">Relayed by</div>
-                                    224.34.143.54
-                                </td>
-                                <td>
-                                    <div class="celltitle">Relayed at</div>
-                                    2018-08-19 19:00
-                                </td>
-                            </tr>
-                            <tr class="blocktransactions">
-                                <td colspan="5">
-                                    <table class="transactions">
-                                        <thead>
-                                            <tr>
-                                                <th>Transaction ID</th>
-                                                <th>Confirmed after</th>
-                                                <th>Size</th>
-                                                <th>Value</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><a href="#">aed73191...5f079fab</a></td>
-                                                <td><i>Coinbase</i></td>
-                                                <td>2419</td>
-                                                <td>50.<span class="suffix">00000000 GRLC</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td><a href="#">aed73191...5f079fab</a></td>
-                                                <td>1 minute</td>
-                                                <td>208</td>
-                                                <td>4.32<span class="suffix">000000 GRLC</span></td>
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="blockconnector"></div>
-                    <table class="block">
-                        <thead>
-                            <tr>
-                                <th colspan="5" class="title">Block <a href="#" class="blockhash">1da69d8bd4f5ba205b31befdee2f7001babd62616303092f5835dc9790555b51</a></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="stat">
-                                <td>
-                                    <div class="celltitle">Height</div>
-                                    445361
-                                </td>
-                                <td>
-                                    <div class="celltitle">Transactions</div>
-                                    4
-                                </td>
-                                <td>
-                                    <div class="celltitle">Total value</div>
-                                    134.<span class="suffix">75497378 GRLC</span>
-                                </td>
-                                <td>
-                                    <div class="celltitle">Mined by</div>
-                                    FreshGRLC.net
-                                </td>
-                                <td>
-                                    <div class="celltitle">Timestamp</div>
-                                    2018-08-19 19:00
-                                </td>
-                            </tr>
-                            <tr class="stat">
-                                <td>
-                                    <div class="celltitle">Size</div>
-                                    334 kB
-                                </td>
-                                <td>
-                                    <div class="celltitle">Difficulty</div>
-                                    56.12
-                                </td>
-                                <td>
-                                    <div class="celltitle">Miner fee</div>
-                                    <span class="zeroes">0.00</span>498899 <span class="suffix">GRLC</span>
-                                </td>
-                                <td>
-                                    <div class="celltitle">Relayed by</div>
-                                    224.34.143.54
-                                </td>
-                                <td>
-                                    <div class="celltitle">Relayed at</div>
-                                    2018-08-19 19:00
-                                </td>
-                            </tr>
-                            <tr class="blocktransactions">
-                                <td colspan="5">
-                                    <table class="transactions">
-                                        <thead>
-                                            <tr>
-                                                <th>Transaction ID</th>
-                                                <th>Confirmed after</th>
-                                                <th>Size</th>
-                                                <th>Value</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><a href="#">aed73191...5f079fab</a></td>
-                                                <td><i>Coinbase</i></td>
-                                                <td>2419</td>
-                                                <td>50.<span class="suffix">00000000 GRLC</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td><a href="#">aed73191...5f079fab</a></td>
-                                                <td>1 minute</td>
-                                                <td>208</td>
-                                                <td>4.32<span class="suffix">000000 GRLC</span></td>
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                        <div style="width: 100%; text-align: center; margin: 0px auto;" ng-hide="blocks != null">
+                            <img src="loading.gif" style="width: 20px; height: 20px;" />
+                        </div>
+                        <div class="blockcontainer" ng-repeat="block in blocks">
+                            <table class="block">
+                                <thead>
+                                    <tr>
+                                        <th colspan="5" class="title">Block <a href="#" class="blockhash">{{block.hash}}</a></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="stat">
+                                        <td style="width: 70px;">
+                                            <div class="celltitle">Height</div>
+                                            {{block.height}}
+                                        </td>
+                                        <td style="width: 100px;">
+                                            <div class="celltitle">Transactions</div>
+                                            {{block.transactions.length}}
+                                        </td>
+                                        <td style="width: 140px;">
+                                            <div class="celltitle">Total value</div>
+                                            {{block.totalvalue.major}}.<span class="suffix">{{block.totalvalue.minor}} {{coin.ticker}}</span>
+                                        </td>
+                                        <td style="width: 205px;">
+                                            <div class="celltitle">Mined by</div>
+                                            <span ng-hide="block.miner.website">{{block.miner.name}}</span>
+                                            <span ng-hide="!block.miner.website"><a href="{{block.miner.website}}" target="_blank">{{block.miner.name}}</a></span>
+                                        </td>
+                                        <td style="width: 140px;">
+                                            <div class="celltitle">Timestamp</div>
+                                            {{block.timestamp}}
+                                        </td>
+                                    </tr>
+                                    <tr class="stat">
+                                        <td>
+                                            <div class="celltitle">Size</div>
+                                            {{block.size.formatted}}
+                                        </td>
+                                        <td>
+                                            <div class="celltitle">Difficulty</div>
+                                            {{block.difficulty}}
+                                        </td>
+                                        <td>
+                                            <div class="celltitle">Miner fee</div>
+                                            {{block.totalfee.raw}} <span class="suffix">{{coin.ticker}}</span>
+                                        </td>
+                                        <td>
+                                            <div class="celltitle">Relayed by</div>
+                                            {{block.relayedby}}
+                                        </td>
+                                        <td>
+                                            <div class="celltitle">Relayed at</div>
+                                            {{block.firstseen}}
+                                        </td>
+                                    </tr>
+                                    <tr class="blocktransactions">
+                                        <td colspan="5">
+                                            <table class="transactions">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Transaction ID</th>
+                                                        <th>Confirmed after</th>
+                                                        <th>Size</th>
+                                                        <th>Value</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="tx in block.transactions">
+                                                        <td><a href="#">{{tx.shortenedtxid}}</a></td>
+                                                        <td ng-hide="tx.coinbase">{{tx.confirmationtime}}</td>
+                                                        <td ng-hide="!tx.coinbase"><i>(Coinbase)</i></td>
+                                                        <td>{{tx.size.raw}}</td>
+                                                        <td>{{tx.totalvalue.major}}.<span class="suffix">{{tx.totalvalue.minor}} {{coin.ticker}}</span></td>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="blockconnector"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

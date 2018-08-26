@@ -7,6 +7,10 @@ body {
     padding-bottom: 4em;
 }
 
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+    display: none !important;
+}
+
 h3 {
     color: $primary;
     font-size: 1.25em;
@@ -79,6 +83,12 @@ tbody td .celltitle {
     font-weight: normal;
     color: $primary;
     font-size: 10pt;
+}
+
+tbody .noentries td {
+    text-align: center;
+    font-weight: bold;
+    font-style: italic;
 }
 
 table .numeric {
