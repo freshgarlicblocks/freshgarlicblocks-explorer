@@ -31,7 +31,7 @@
         this.TUX = {
             'name':         'Tuxcoin',
             'ticker':       'TUX',
-            'logo':         'https://tuxcoin.io/wp-content/uploads/2018/08/NEW-logo.png',
+            'logo':         'http://tuxcoin.io/assets/images/TC_Logo_1000x1000.png',
             'api':          '/api/tux',
             'blockTime':    61,
             'blockReward':  69,
